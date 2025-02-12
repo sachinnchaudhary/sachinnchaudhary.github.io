@@ -1,0 +1,76 @@
+/* GLOBAL RESET */
+* {
+  box-sizing: border-box;
+}
+
+/* BASE STYLES */
+body {
+  margin: 0;
+  padding: 2rem;
+  background-color: #000; /* black background */
+  color: #eee;            /* light text */
+  font-family: "Times New Roman", Times, serif;
+  line-height: 1.6;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: #fff;
+}
+
+/* Each .post is a single line: date on the left, title in the center */
+.post {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;       /* space between posts */
+  min-height: 2rem;          /* ensures row is tall enough for text */
+}
+
+/* DATE on the left (fixed or narrower width) */
+.date {
+  width: 150px;              /* adjust as you like */
+  margin-left: 18rem;
+  color: #ccc;               /* slightly lighter color for date */
+  font-size: 1.3rem;
+  white-space: nowrap;       /* keeps "09 Jan, 2025" on one line */
+}
+
+/* TITLE in the middle (flex:1 + center text) */
+.title {
+  flex: 1;                    /* fill remaining space */
+  text-align: center;         /* center the title text */
+  font-size: 1.5rem;
+  color: #fff;
+  margin: 0 1rem;             /* optional horizontal margin */
+  border-bottom: 2px solid transparent; /* for optional hover effect below */
+}
+
+
+.title:hover {
+  border-bottom: 2px solid white;
+  cursor: pointer;
+}
+
+.title {
+  margin-left: -15rem;
+}
+
+.title a,
+.title a:visited {
+  color: #fff;            /* force links to be white */
+  text-decoration: none;  /* remove underline, if you want */
+}
+
+nav a {
+  color: #fff;
+  font-size: 1rem;
+  text-decoration: none;
+  margin-left: 1rem;
+}
+nav a:hover {
+  text-decoration: underline;
+}

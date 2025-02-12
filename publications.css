@@ -1,0 +1,93 @@
+/* GLOBAL RESET */
+* {
+  box-sizing: border-box;
+}
+
+/* BASE STYLES */
+body {
+  margin: 0;
+  padding: 2rem;
+  background-color: #000; /* black background */
+  color: #eee;            /* light text */
+  font-family: "Times New Roman", Times, serif;
+  line-height: 1.6;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: #fff;
+}
+
+/* Each .post is a single line: date on the left, title in the middle */
+.post {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;       /* space between posts */
+  min-height: 2rem;          /* ensures row is tall enough for text */
+}
+
+/* DATE on the left */
+.date {
+  /* Remove or reduce large left margins so it doesn’t push too far right */
+  margin-left: 1rem;
+  width: 120px;  /* optional fixed width; tweak as you like */
+  color: #ccc;
+  font-size: 1.3rem;
+  white-space: nowrap; /* keeps “09 Jan, 2025” on one line */
+}
+
+/* TITLE in the middle */
+.title {
+  flex: 1;                 /* fill remaining horizontal space */
+  text-align: center;
+  font-size: 1.5rem;
+  color: #fff;
+  margin: 0 1rem;          /* small horizontal margin */
+  border-bottom: 2px solid transparent; /* for hover effect */
+}
+.title:hover {
+  border-bottom: 2px solid white;
+  cursor: pointer;
+}
+
+/* Link color forced to white (no default link blue) */
+.title a,
+.title a:visited {
+  color: #fff;
+  text-decoration: none;
+}
+
+nav a {
+  color: #fff;
+  font-size: 1rem;
+  text-decoration: none;
+  margin-left: 1rem;
+}
+nav a:hover {
+  text-decoration: underline;
+}
+
+/*
+  RESPONSIVE MEDIA QUERY
+  - On screens narrower than 600px, stack date and title to avoid overlap
+*/
+@media (max-width: 600px) {
+  .post {
+    display: block;         /* no flex layout */
+    margin-bottom: 1.5rem;
+  }
+  .date {
+    display: block;
+    margin: 0 0 0.5rem 0;   /* top left corner, then spacing below */
+    width: auto;            /* let the date take its natural width */
+  }
+  .title {
+    display: block;
+    text-align: left;       /* or center if you prefer */
+    margin: 0;              /* reset margins on small screens */
+  }
+}
