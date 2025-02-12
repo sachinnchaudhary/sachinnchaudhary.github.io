@@ -15,7 +15,7 @@ body {
 /* TOP SECTION: ABOUT ME (LEFT) + PHOTO (RIGHT) */
 .top-section {
   display: flex;
-  flex-wrap: wrap;            /* wrap on smaller screens if needed */
+  flex-wrap: wrap;          /* wrap on smaller screens if needed */
   justify-content: space-between;
   align-items: flex-start;
   max-width: 1200px;
@@ -27,40 +27,36 @@ body {
 .about-box {
   flex: 1;
 }
-
 .about-box h1 {
   margin-top: 0;
   margin-bottom: 1rem;
   color: #fff;
 }
-
 .about-box p {
   font-size: 1.4rem;
   word-spacing: 0.3rem;
   margin-bottom: 1rem;
 }
 
-/* PHOTO on RIGHT */
+/* RIGHT PHOTO COLUMN */
 .photo-col {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   flex: 1;
   min-width: 250px;
+  margin-top: 5rem; /* shift photo downward if you want extra space */
 }
 
+/* Make the image responsive */
 .profile-pic {
-  max-width: 350px;
+  /* Will never exceed its container’s width */
+  max-width: 100%;
   height: auto;
   object-fit: cover;
+  border-radius: 8px; /* optional */
 }
-
-.photo-col {
-  margin-top: 5rem;  /* or however many rem/pixels you like */
-}
-
-
 
 /* BOTTOM SECTION: TWO COLUMNS (LEFT: Publications/Blogs, RIGHT: X/Email/GitHub) */
 .links-section {
@@ -73,23 +69,20 @@ body {
   gap: 2rem;
 }
 
-/* LEFT COLUMN: Publications & Blogs */
 .links-left {
   flex: 1;
 }
-
-/* RIGHT COLUMN: X, Email, GitHub */
 .links-right {
-  flex: 0.4;
+  flex: 0.4; /* or 1, if you want them equal widths */
 }
 
+/* Headings & links in the bottom section */
 .links-section h2 {
   font-size: 1.6rem;
-  font-weight: normal;  /* or bold if you prefer */
+  font-weight: normal;
   margin: 1rem 0 0.5rem;
   color: #fff;
 }
-
 .links-section a {
   color: #ccc;
   text-decoration: none;
@@ -98,36 +91,22 @@ body {
   text-decoration: underline;
 }
 
-/* UNDERSCORE LINES */
+/* The “underscore” lines for separation */
 .line {
-  margin: -0.5rem 0 1rem; /* pulls line close to heading */
+  margin: -0.5rem 0 1rem;
   color: #ccc;
   font-size: 1.2rem;
 }
 
-
-/* For the .photo-col and .profile-pic in top-section */
-.photo-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Remove any huge margins if you have them */
-}
-
-/* Make sure the image doesn't overflow on small screens */
-.profile-pic {
-  max-width: 100%;   /* scale down if needed */
-  height: auto;      /* maintain aspect ratio */
-  border-radius: 8px;/* optional round corners */
-  object-fit: cover; /* if you want it to fill properly */
-}
-
-/* On narrower screens, stack about-box and photo-col vertically */
+/* RESPONSIVE LAYOUT FOR SMALLER SCREENS */
 @media (max-width: 600px) {
+  /* Stack about-box and photo vertically */
   .top-section {
-    display: block; /* Instead of display: flex or something else */
+    display: block; /* instead of flex */
   }
-  .about-box, .photo-col {
+  .about-box,
+  .photo-col {
     margin-bottom: 1rem;
+    margin-top: 0; /* remove big top margin on mobile if desired */
   }
 }
