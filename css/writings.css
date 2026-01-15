@@ -1,0 +1,91 @@
+/* ---------- Base ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Background ---------- */
+body {
+  background-color: #0b0d10;
+  color: #d8d8d8;
+  font-family: "EB Garamond", Georgia, serif;
+}
+
+/* ---------- Back Navigation ---------- */
+.nav-back {
+  position: absolute;
+  top: 1.8rem;
+  left: 4.5rem;
+}
+
+.nav-back a {
+  font-size: 1.2rem;
+  color: #9a9a9a;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-back a:hover {
+  color: #d8d8d8;
+  transform: translateX(2px);
+}
+/* ---------- Layout ---------- */
+.page {
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  width: 100%;
+  max-width: 680px;
+  padding: 4rem 1.5rem 6rem;
+  text-align: center;
+}
+
+/* ---------- Title ---------- */
+h1 {
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin-bottom: 3rem;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Writing List ---------- */
+.writing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.writing-list li {
+  margin-bottom: 1.4rem;
+}
+
+.writing-list a {
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: #d8d8d8;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.writing-list a:hover {
+  transform: translateX(2px);
+  color: #ffffff;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+  .content {
+    padding-top: 3rem;
+  }
+
+  .writing-list a {
+    font-size: 1.15rem;
+  }
+}

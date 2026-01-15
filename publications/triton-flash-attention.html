@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Triton Flash Attention Kernel Walkthrough</title>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <!-- Math (KaTeX) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script>
+
+  <link rel="stylesheet" href="../css/article.css">
+</head>
+<nav class="nav-back">
+  <a href="../publications.html">publications</a>
+</nav>
+  <main class="page">
+    <article class="content">
+
+      <h1>Triton Flash Attention Kernel Walkthrough: The Forward Pass</h1>
+      <div class="meta">09-24-2025</div>
+
+      <p>
+        So you’ve learned about basic Triton language primitives like
+        <code>make_block_ptr</code>, but how does it fit into a real,
+        high-performance GPU kernel?
+      </p>
+
+      <p>
+        The goal of this article is to understand the <em>why</em> — the design
+        decisions that make FlashAttention fast by aligning computation with
+        the GPU memory hierarchy.
+      </p>
+
+      <h2>Background: The FlashAttention Intuition</h2>
+
+      <p>
+        Standard attention computes an \( n \times n \) attention matrix.
+        For large \( n \), this matrix does not fit in SRAM, forcing constant
+        reads and writes to HBM.
+      </p>
+
+      <pre><code class="language-python">
+def parallel_attn(q, k, v):
+    # Prepare launch parameters
+    return ParallelAttentionFunction.apply(q, k, v)
+      </code></pre>
+
+      <p>
+        The key idea behind FlashAttention is tiling: we never materialize the
+        full matrix. Instead, we compute attention block-by-block.
+      </p>
+
+      <p>
+        Mathematically, we are still computing:
+      </p>
+
+      <p class="math">
+        \[
+        \mathrm{Attention}(Q, K, V) = \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d}}\right)V
+        \]
+      </p>
+
+    </article>
+  </main>
+
+</body>
+</html>

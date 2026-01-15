@@ -1,41 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MY Research</title>
-  <link rel="stylesheet" href="publications.css">
+  <meta charset="UTF-8" />
+  <title>Publications</title>
+
+  <!-- Same font as rest of site -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/publications.css">
 </head>
 <body>
-  <header>
-    <h1>My research publications</h1>
-    <!-- Add a nav or simple link back to your main homepage -->
-    <nav>
-      <a href="index.html">Home</a>
-    </nav>
-  </header>
+  <nav class="nav-back">
+    <a href="index.html">back</a>
+  </nav>
+  <main class="page">
+    <section class="content">
 
-  <!-- Post #1 -->
-  <div class="post">
-    <span class="date">18 Jan, 2025</span>
-    <span class="title">
-      <!-- Link to a separate HTML file for full content -->
-      <a href="post1.html">
-        Reinforcement learning with multiple interpretations
-      </a>
-    </span>
-  </div>
+      <h1>publications</h1>
 
-  <!-- Post #2 -->
-  <div class="post">
-    <span class="date">09 Jan, 2025</span>
-    <span class="title">
-      <a href="post2.html">
-        Gan implementation in Reinforcement learning
-      </a>
-    </span>
-  </div>
+      <ul class="pub-list">
+        <li>
+          <a href="publications/triton-flash-attention.html">
+            Gram-Space Manifold Muon
+          </a>
+        </li>
 
-  <!-- Add more posts similarly (each linking to its own page) -->
+        <li>
+          <a href="#">
+            Triton Flash Attention Kernel Walkthrough: The Forward Pass
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            MoMoE: Memory-optimized Mixture of Experts
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            Implementing Flash Attention in TileLang
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            Deriving an Optimizer under the Nuclear Norm
+          </a>
+        </li>
+      </ul>
+
+    </section>
+  </main>
+
 </body>
 </html>
-
