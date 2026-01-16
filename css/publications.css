@@ -77,6 +77,15 @@ h1 {
     font-size: 1.7rem;
   }
 }
+
+@media (max-width: 600px) {
+  .book-list li,
+  .writing-list a,
+  .quest-list a {
+    font-size: 1.3rem;
+    line-height: 1.75;
+  }
+}
 /* ---------- Back / Home Navigation ---------- */
 .nav-back {
   position: absolute;
