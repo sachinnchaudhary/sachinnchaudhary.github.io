@@ -89,12 +89,16 @@ pre code {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-  h1 {
-    font-size: 1.6rem;
+  p,
+  li {
+    font-size: 1.3rem;
+    line-height: 1.75;
   }
+}
 
-  p {
-    font-size: 1.1rem;
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.7rem;
   }
 }
 

@@ -80,12 +80,15 @@ h1 {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-  .content {
-    padding-top: 3rem;
+  p,
+  li {
+    font-size: 1.3rem;
+    line-height: 1.75;
   }
+}
 
-  .intro,
-  .ambition-list li {
-    font-size: 1.1rem;
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.7rem;
   }
 }

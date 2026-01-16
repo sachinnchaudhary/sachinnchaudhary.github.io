@@ -50,8 +50,16 @@ body {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-  .center-menu a {
-    font-size: 1.4rem;
+  p,
+  li {
+    font-size: 1.3rem;
+    line-height: 1.75;
+  }
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.7rem;
   }
 }
 

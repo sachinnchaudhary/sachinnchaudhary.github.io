@@ -94,16 +94,15 @@ h1 {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-  .row {
-    grid-template-columns: 1fr;
-    gap: 0.2rem;
+  p,
+  li {
+    font-size: 1.3rem;
+    line-height: 1.75;
   }
+}
 
-  .label {
-    font-size: 0.9rem;
-  }
-
-  .value a {
-    font-size: 1.05rem;
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.7rem;
   }
 }

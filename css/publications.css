@@ -66,15 +66,17 @@ h1 {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-  .content {
-    padding-top: 3rem;
-  }
-
-  .pub-list a {
-    font-size: 1.15rem;
+  p,
+  li {
+    font-size: 1.3rem;
+    line-height: 1.75;
   }
 }
-
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.7rem;
+  }
+}
 /* ---------- Back / Home Navigation ---------- */
 .nav-back {
   position: absolute;
