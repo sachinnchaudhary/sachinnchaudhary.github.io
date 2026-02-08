@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Triton Flash Attention Kernel Walkthrough</title>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <!-- Math (KaTeX) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script>
+
+  <link rel="stylesheet" href="../css/article.css">
+</head>
+<nav class="nav-back">
+  <a href="../publications.html">publications</a>
+</nav>
+  <main class="page">
+    <article class="content">
+
+      <h1>CudaRL</h1>
+      <div class="meta">08-02-2026</div>
+
+      <p>
+        I was working with RL and implementing each algorithm of it from Q-learning to PPO, 
+        thats where i felt gap that pytorch like library should exist for RL where i just need to type out PPO()
+        and all the background complexity implemented automatically and top on that it need to have Cuda accleration too, so with GPU the compute intensive algorithms can be run faster. 
+        For that i started to work on CudaRL. 
+       </p>
+      <p> 
+        First question i need to answer is that for which part we can utilize parallization of GPU computation. So i wrote GAE(Generalized Advantage Estimation) cuda Kernel first.
+      </p> 
+       
+      <p> 
+       The reason this kernel make even single environment PPO faster is because advantage calculation scales linealy with rollout length T. Where Cuda-GAE kernel this computation by replacing python loop with single GPU kernel. 
+       for multiple epoch PPO this becomes even faster and much more sample efficient. as computing advantage function happens parallel for all environment.
+      </p>
+      
+      <p> 
+        CudaRL includes all policy gradient algorithms such as Reinforce, Reinforce with baseline, A2C, PPO, and GRPO. 
+      </p>
+      <p> 
+        I will iterate over CudaRl library as i have interesting things to add.
+      </p>
+      <p>
+        Faster RL training for all !
+      </p>
+      <p>
+     <br>
+  <ul class="reading-list">
+    <p><li><a href="https://github.com/sachinnchaudhary/cudaRL">CudaRL github repo</a></li>
+    <li><a href="https://x.com/chsacy/status/2010838839162744958">CudaRL X post</a></li>
+  
+    </article>
+  </main>
+
+</body>
+</html>
