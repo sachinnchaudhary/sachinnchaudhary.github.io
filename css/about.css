@@ -92,3 +92,30 @@ li {
 .content a:hover {
   text-decoration: underline;
 }
+
+
+/* --- Yantra --- */
+.yantra {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 2.4rem;
+  color: #e6e6e6; /* lines use currentColor */
+}
+
+.yantra-svg {
+  width: min(420px, 100vw); /* bigger, since it’s flatter now */
+  height: auto;
+  display: block;
+}
+
+.yantra-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.95;
+}
+
+
+  
