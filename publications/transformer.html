@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transformer: general memory computation system</title>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <!-- Math (KaTeX) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script>
+
+  <link rel="stylesheet" href="../css/article.css">
+</head>
+<nav class="nav-back">
+  <a href="../publications.html">publications</a>
+</nav>
+  <main class="page">
+    <article class="content">
+
+      <h1>Transformer: general memory computation system</h1>
+      <div class="meta">08-02-2026</div>
+
+       <p>
+        RNN basically has recurrence which is memory bounded by temporal depth. that means there is one vector which basically compressing entire information of its evolution. Information bottleneck can be clearly seen here that in long sentences the residue of earlier information will vanish in long arc. 
+       </p>
+       <p> 
+        when we have long dependencies then we need to have the indepdent token relation with all of them not like dependent one. for example in sentence token 2 effects 50 then in RNN gradient pass through 48 steps but it dont need to do that the information between token 2 and 50 is independent of those 48 ones means just information need to be between 2 and 50 and this independence is important which is not present in RNN. this not have just vanishing gradient problem but the deepeer one is hidden state will overwrite information.
+       </p>
+       <p> 
+        this is what attention mechanism got right why should i move sequentially in long computation chain if i can look into the tokens i want independently ? so the dependency path complexity reduced from n to 1. transformer discarded memory evolution and saw as communication problem. you see this one is big shift instead of temporal memory we got relational communication system. This removes information bottleneck where each token has individual vector to compress information, so in RNN the token 50 access token 2 only throgh one compressed memory but here token 50 can attend an look to token 2 directly. this prevent contamination of information compression why should entire vector changes when there is just reltion of one token to another one instead of all tokens. 
+       </p>
+        <p> 
+         One question i got is "why does changing path length from n to 1 matter?" because learning happens through signals two signal travel through network one is information flow during the forward pass and gradient flow during the backward pass in RNN this signal travel through entire long sequence from which every intermediate step can distort signal(ex. telephone game noise), while attention mechanism just has direct mapping so information and gradient has no distortion.  This worked because language relations are not are not sequential but they are relational. sequntial forms graph of dependencies attention let model discover graph directly.
+        </p>
+        <p> 
+          lets take sentence "The trophy didn't fit into the suitcase because it was too big." what does "it" refers to here ? and lets change the word "The trophy didn't fit into the suitcase because it was too small." now what does "it" here refers to ?
+        </p>
+        
+        <P>
+            you see that meaning is only found when entire information is accessible let model see entire context.  it again shows its not the temporal depth problem its communication problem" above example shows words relation are not linear chain relation(it-> trophy, too big ->trophy, fit-> suitcase) which RNN assumes. 
+        </P>
+        <p>
+            two things matter storage(Each token keeps its own vector.) and communication(Attention allows tokens to retrieve relevant information from others.) this is distributed memory + retrieval mechanism. where entire thing shifted from time based reasoning to relation based reasoning.   
+        </p>
+        <p>
+            Deeper interpretation of attention is its content-addressable memory where each token ask Which other tokens are relevant for computing my representation? and then retrieve information from them. but how it generalizes well with indpendent mapping because it learns relations not positions. this leads to learning instead of memorization.
+        </p>
+        <p> 
+          the classical memory in neural network before transformer had state based memory. where memory is entire past stored in evolving vector. so two problem is compression bottleneck and retrieval problem where You cannot easily retrieve specific past information model The model must remember everything implicitly. Transfomer uses compeletely different idea instead of one memory slot it has many(each token representation is memory vector) and this is what i mean by distributed memory where Information is distributed across many vectors instead of compressed into one. Distributed memory makes retrieval easier. in earlier example "it" refers to noun in distributed memory system query("it") → retrieve("trophy") while in RNN query("it") → decode from compressed hidden state which is harder so transformer has this two function storage and retrieval.   
+        </p> 
+        <p> 
+         the reason its content addressable memory because "You retrieve information by similarity of content, not by location." so in normal computer you access memory by address(ex. memory[42]) but in content addressable memory its retrieve("animal concept") so the system returns the closest stored representation.
+        </p> 
+        <p>
+         When you understand this attention mechanism becomes inevitable where its query token compare with all stored tokens where comparison is similarity(query, key) where the tokens with highest similarity are retrieved. So attention is basically search in memory using semantic similarity. So query Q means what information is i am looking at ? K is about What type of information does this token contain? and then V is The information that should be retrieved. its query → match keys → retrieve values means its just memory lookup table. 
+        </p>
+        <p> 
+            this resembles human cognition whre memory models as "memory as associative retrieval." you are in some state and find instant recall associated things. we didn't look up an address but our brain matched content similarity and this is what transformer do. Clearly this beats sequential memory because to retrieve something you must decode the summary(transformer has memory as set of vectors so it can search across them) this is why retrieval becomes parallel instead of sequential.
+        </p>
+        <p> 
+            We can think of transformer layer as two steps, step 1 is information retrieval(Attention gathers relevant context.) and information processing(Feedforward layers transform the gathered information.) each layer is retrieve context and process representation repeated many times.  With this another part of architecture becomes inevitable as question is "why multiple heads in attention mechanism ?" because model can learn multiple relational graph simentaniously.
+        </p>
+        <p> 
+         so transformer is differentiable database which behaves as query system + associative memory + parallel retrieval. for me the interesting part is how its relate with structure of human attention where humans process scene like many representations in parallel + attention mechanism selecting relevant pieces shows the architecture implicitly discovered a similar computational principle. so architecture becomes: distributed memory + content-based retrieval + local computation + iterative refinement.
+        </p>
+        <p> 
+         question do appear that "how Large language models trained only to predict the next token begin to generalize well and perform multi-step reasoning. How can a system built only from memory retrieval and feed-forward transformations perform reasoning and got generalized well ?" idea is just "retrieve context and transform representation" because reasoning is iterative refinement for example Question: John has 3 apples and buys 2 more. How many apples? for this model need to know recognize numbers, recognize operation, apple addition see the pattern this is well suited for transformer because it bring together distant pieces of information, So reasoning becomes progressive representation transformation. thats why its not statistical computation as there is something deep here as model need to learn something for what producing next token. and thats why scaling hepled as large models can store enormous amounts of latent structure the model begins to represent deeper patterns in data and reason So this is why model generalized well.
+        </p>
+        <br> 
+        <p> 
+         thats why "attention is all you need." 
+        </p>
+
+        
+        
+        
+     
+ 
+  
+
+  </article>
+  </main>
+</body>
+</html>  
