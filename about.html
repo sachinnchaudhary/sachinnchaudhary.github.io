@@ -181,25 +181,31 @@
 
 
       <p>
-       I am Sachin. I work on Deep learning and Reinforcement learning. I believe AGI will be DL + RL fused together. 
-       I think Great thing about Humans is they can explain physical reality and finds invariants in it. this makes me wonderous about
-       intelligence and broader AI for science.   
+       I am Sachin. I work on Deep learning and Reinforcement learning. I think AGI will be DL + RL fused together. 
+        
       </p>
 
       <p>
-       Right now I am working on Continual Learning and generalization.  
-       I have this question: can computers crate new knowledge ? If human intelligence can create physics, maths or something which help us to understand reality better then why not computers ? I want to answer this question. 
-       
-       
+       My purpose is making long horizon RL working with generalization. I think that human intelligence when paired up with long horizon agency produces magical outcomes. Aim is to make agents working for months and even years autonomously.
       </p>
-
-      <p>
-       I am also a part of core team at @edutor where we wanted to “personalize education with AI” and engineering the post-AGI era's true form of learning and teaching. 
-      </p>
-      <p>
+      
+       <p>things which i am learning and interests me.</p>
+        <ul>
+            <li>all important attention architectures of deep learning.</li>
+            <li>agentic RL for language models.</li>
+            <li>anything on intelligence and learning</li>
+          </ul>
+        <p> at broader computation fascinates me, i feel like computation is foundational property of universe. it could be that physics is informational. i am trying to <a href="writings/computer.html">understand computer</a> from scratch. 
+        <p> 
+          I remember words of Max plank in his autobiography that "laws of human reasoning
+          coincide with the laws governing the world...therefore, pure reasoning can enable man to gain an insight into the mechanism
+          of the latter." Our mind can reach into the fabric of universe. I have curiosity to find this laws for intelligence and learning, for me i think its single most important quest. "Understanding intelligence which help us to understand universe" 
+        
+       <p>
        core principles and ideas.
       </p> 
       <ul>
+       
           <li>“It just happens they got interested in this thing, and they learned all this stuff. They're just people. …So if you take an ordinary person who's willing to devote a great deal of time and study and work and thinking and mathematics, then he's become a scientist.”  I think about this Richard feynman lines a lot. </li>
           <li>everything that is "understood" can be "understood"</li>
           <li>be unreasonable yet truthful.</li>
@@ -207,11 +213,126 @@
       </ul>
 
       <p>
-        I love to read <a href="bookshelf.html">books</a>, sometime i play chess and am also learning to play piano. I have <a href="sidequest.html">side quests</a> too.
+        I enjoy reading <a href="bookshelf.html">books</a>, <a href="https://www.chess.com/member/chsacy">chess</a>(learning with closed eyes), playing piano, rabbit holes, meditation, solitude, stargazing, winters, lush greenery, aravalli's mountain range, <a href="https://www.incompleteideas.net/IncIdeas/BitterLesson.html">bitter lesson</a>, Competitive programming, o3, discussion with gpt pro models.
       </p>
+      <p>
+        i admire: Richard feynman, benjamin franklin, Elon musk, demis hassabis, steve jobs, northrop grumman.   
+      </p>
+      <p>Courage and curiosity</p>
+      <ul><p>
+        i think courage to ask bold question is important. Upnishad is greatest example for this courage. Just like science is about discovering extrinsic universe they asked important question "who discover existrinsic universe and lets go intrinsic instead of extrinsic". they asked bold questions like "what makes true in everchanging subjective experience and matter ?"  
+      </p></ul>
+      
+      <p> 
+        naturally i fall in love with science and engineering, i cultivated it throughout my childhood. i had small laboratory where i collected pieces from scrapes and broken toys. i use it to make models of rockets, spaceships, drones and even satelites (
+        <a href="#" class="img-toggle-link" data-img="/images/kontora.png" data-alt="spaceships/drone model image">img 1</a>, <a href="#" class="img-toggle-link" data-img="/images/kenaro.png" data-alt="drone model image">img 2</a>
+        ) its spiritual thing for me when out of all this scrapes wonderful creation can be done from imagination. 
+      </p>
+      <p>
+        Hardware still <a href="sidequests/building-hardware.html">fascinates</a> me, for now important quest is innovating intelligence.  
+        </p>
+      <p> 
+        i want to understand this fabric of universe and put that into creation just like i did that with scrapes and motors. imagination understanding and innovation. 
+      </p> 
 
+    
+
+      <aside class="image-preview-panel" id="image-preview-panel" hidden>
+        <button type="button" class="image-preview-close" id="image-preview-close" aria-label="Close image preview">x</button>
+        <img id="image-preview" src="" alt="" loading="lazy">
+      </aside>
+      
     </article>
   </main>
+
+  <script>
+    (function () {
+      const panel = document.getElementById("image-preview-panel");
+      const preview = document.getElementById("image-preview");
+      const closeBtn = document.getElementById("image-preview-close");
+      const links = document.querySelectorAll(".img-toggle-link");
+      let activeLink = null;
+
+      function hidePanel() {
+        panel.hidden = true;
+        preview.removeAttribute("src");
+        preview.removeAttribute("alt");
+        activeLink = null;
+      }
+
+      function placePanelNearLink(link) {
+        const rect = link.getBoundingClientRect();
+        const margin = 12;
+        const gap = 14;
+        const panelWidth = panel.offsetWidth || 320;
+        const panelHeight = panel.offsetHeight || 420;
+
+        // Prefer showing above the clicked link.
+        let top = rect.top - panelHeight - gap;
+        const maxTop = window.innerHeight - panelHeight - margin;
+
+        if (top < margin) {
+          // If above doesn't fit, try below; otherwise clamp inside viewport.
+          const belowTop = rect.bottom + gap;
+          if (belowTop <= maxTop) {
+            top = belowTop;
+          } else {
+            top = Math.max(margin, maxTop);
+          }
+        }
+
+        let left = rect.right + 18;
+        left = Math.max(margin, Math.min(left, window.innerWidth - panelWidth - margin));
+
+        panel.style.top = top + "px";
+        panel.style.left = left + "px";
+        panel.style.right = "auto";
+      }
+
+      preview.addEventListener("load", function () {
+        if (!panel.hidden && activeLink) {
+          placePanelNearLink(activeLink);
+        }
+      });
+
+      links.forEach((link) => {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          const src = this.getAttribute("data-img");
+          const alt = this.getAttribute("data-alt") || "Preview image";
+
+          if (!src) return;
+
+          if (!panel.hidden && preview.getAttribute("src") === src) {
+            hidePanel();
+            return;
+          }
+
+          activeLink = this;
+          preview.src = src;
+          preview.alt = alt;
+          panel.hidden = false;
+          requestAnimationFrame(() => placePanelNearLink(activeLink));
+        });
+      });
+
+      closeBtn.addEventListener("click", hidePanel);
+      document.addEventListener("click", function (event) {
+        if (panel.hidden) return;
+        if (panel.contains(event.target)) return;
+        if (event.target.closest(".img-toggle-link")) return;
+        hidePanel();
+      });
+      window.addEventListener("resize", function () {
+        if (!panel.hidden && activeLink) {
+          placePanelNearLink(activeLink);
+        }
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !panel.hidden) hidePanel();
+      });
+    })();
+  </script>
 
 </body>
 </html>
