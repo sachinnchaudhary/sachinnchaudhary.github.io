@@ -13,6 +13,8 @@ body {
   background-color: #0b0d10; /* deep black, not pure */
   color: #d8d8d8;
   font-family: "EB Garamond", serif;
+  font-size: 1.3rem;
+  line-height: 1.7;
 }
 
 /* ---------- Layout ---------- */
@@ -29,29 +31,39 @@ body {
 
 /* ---------- Typography ---------- */
 p {
-  font-size: 1.3rem;
-  line-height: 1.7;
+  font-size: inherit;
+  line-height: inherit;
   margin-bottom: 1.6rem;
 }
 
 /* Bullet points */
 ul {
-  margin: 2rem 0 2.2rem;
-  padding-left: 1.2rem;
+  list-style-type: disc;
+  padding-left: 1.6rem;
+  margin: 0.7rem 0 1.4rem;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 li {
-  font-size: 1.25rem;
-  line-height: 1.7;
-  margin-bottom: 0.6rem;
+  display: list-item;
+  margin-bottom: 0.65rem;
+}
+
+li:last-child {
+  margin-bottom: 0;
 }
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-  p,
-  li {
+  body {
     font-size: 1.3rem;
     line-height: 1.75;
+  }
+
+  ul {
+    padding-left: 1.4rem;
+    margin: 0.65rem 0 1.2rem;
   }
 }
 
@@ -91,6 +103,49 @@ li {
 
 .content a:hover {
   text-decoration: underline;
+}
+
+/* --- Inline image links + side preview --- */
+.img-toggle-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: white;
+  text-underline-offset: 0.15em;
+}
+
+.image-preview-panel {
+  position: fixed;
+  top: 5.5rem;
+  left: 6rem;
+  right: auto;
+  width: clamp(320px, 36vw, 500px);
+  max-height: calc(100vh - 7rem);
+  overflow: auto;
+  padding: 0.7rem;
+  border: 1px solid #3b3f45;
+  background: #0f1217;
+  z-index: 20;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.image-preview-panel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(76vh, 820px);
+  object-fit: contain;
+}
+
+.image-preview-close {
+  display: inline-block;
+  margin: 0 0 0.55rem auto;
+  padding: 0.12rem 0.45rem;
+  border: 1px solid #50545c;
+  background: #11151c;
+  color: #d8d8d8;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
 }
 
 
