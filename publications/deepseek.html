@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notes of deepseek</title>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <!-- Math (KaTeX) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script>
+
+  <link rel="stylesheet" href="../css/article.css">
+</head>
+<nav class="nav-back">
+  <a href="../publications.html">publications</a>
+</nav>
+  <main class="page">
+    <article class="content">
+
+      <h1>My notes on DeepSeek-v4</h1>
+      <div class="meta">24-04-2026</div>
+   
+       <p>  
+         i am nerdsniped by <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/blob/main/DeepSeek_V4.pdf">DeepSeek-v4</a>. I tried to understand tech report and thought it would be better to amplify things here.   
+       </p>
+       <h2 style="font-weight: normal;"> 
+        TL;DR
+       </h2>
+       <p> 
+        The real problem: not “can we fit 1M tokens,” but “can we use them cheaply?” The core bottleneck deepseek saw is reasoning models benefit from test-time scaling, longer thinking, more tool use, longer agent trajectories, but vanilla attention makes long contexts expensive because every token keeps attending to a growing KV history.    
+       </p>
+       <p> 
+        DeepSeek-V4 is their attempt to make million-token reasoning/agent context practical by redesigning attention, residual connections, optimizer, training stability tricks, quantization, kernel infra, KV-cache management, post-training, and agent sandboxes together.
+       </p>
+       <p>
+        During decoding, each new token attends to all previous tokens: KV cache memory ≈ O(L × layers × KV size) so harder question becomes "can every new generated token still be affordable after seeing 1M previous tokens?" Their answer is to compress and sparsify attention so long context becomes a retrieval/memory problem, not a full dense-attention problem.
+       </p>   
+       <p>  
+        They focused on single-token inference FLOPs(floating-point operations per next token in a sequence.). where O(L²) become expense. Instead of attending to every single previous token individually, V4 uses Compressed Sparse Attention (CSA) and Heavily Compressed Attention (HCA):
+       </p> 
+       
+      <p>1. where CSA compresses groups of tokens (e.g., every 4 tokens) into one entry before performing attention. 2. HCA uses even more aggressive compression (e.g., 128 tokens into one entry).</p>
+    
+        <p> 
+          Along with this  The model uses BF16 precision for Rotary Positional Embedding (RoPE) dimensions but applies FP8 precision to the rest of the KV entries. This alone cuts the KV cache size nearly in half. results into V4-Pro uses only 27% of the single-token inference FLOPs compared to V3.2. V4-Flash is even more efficient, using only 10% of the FLOPs.  
+        </p>
+       
+        <h2 style="font-weight: normal;"> 
+         Architecture
+        </h2>
+        <h2 style="font-weight: normal;">Hybrid attention</h2>
+        <p> 
+         The first innovation in architecture is hybrid attention of CSA: Compressed Sparse Attention, HCA: Heavily Compressed Attention, Sliding-window local attention branch.   
+        </p>
+        <p>  
+         1. CSA(compressed sparse attention): with SWA(sliding window attention) focusing on recent past of tokens(n tokens) it then performs CSA where every n=4 tokens KV memory compressed into 1 single memory entry. So for 1M tokens(1,000,000 tokens / 4 =) 250,000 compressed entries which is still expensive. So it adds Lightened Indexer, indexer scores compressed blocks and selects only the top-k relevant blocks. So a V4-Pro token does not attend to all 250K compressed entries. It attends to the top 1024 compressed entries, plus a local sliding window. CSA is basically learned retrieval inside the attention layer.
+        </p>
+        <p>
+          2. HCA (Heavily Compressed Attention): HCA compress even more aggressively where it compresses 128 KV entries into one. So for 1M tokens its 7,812 compressed entries. HCA does dense attention over these heavily compressed entries. It does not need top-k sparse selection because the compressed length is already small.
+        </p>
+        <p>  
+         more optimization come from using shared key-value multi-query attention in CSA and HCA. One more thing to add here is during training they do not jump to 1M context immediately
+         it uses a sequence-length curriculum: 4K → 16K → 64K → 1M. They also do not begin with sparse attention immediately. For V4-Flash, they warm up with dense attention for the first 1T tokens, then introduce sparse attention at 64K. They also warm up the CSA indexer before using sparse attention for the rest of training.
+        <p> 
+        two small changes: First, attention sink: each head has a learnable sink logit. This lets the attention distribution sum to less than 1. In normal softmax, attention must distribute all probability mass somewhere. With attention sink, a head can effectively say, “I do not need to attend much to any previous token.” Second, partial RoPE: they apply rotary positional embedding only to part of the query/KV dimensions, specifically the last 64 dimensions. Because compressed KV entries are used as both keys and values, they also apply a corrective RoPE to attention outputs to preserve relative-position behavior.
+        </p>
+        <p> 
+         In a normal transformer, the Query is rotated by i and the Key is rotated by j. When they interact, the math naturally creates (i - j). The Value vector is left completely alone (unrotated), so the output is not contaminated. But here key-values are compressed so one genius move here is doing -i in last 64 dim of value vector rotation instead of +i position in Partial RoPE which only gives relative position instead of fixed position.  
+        </p>
+        <h2 style="font-weight: normal;">
+         MoE: 
+        </h3> 
+        <p> 
+          There are several interesting MoE choices. They change the router affinity activation from Sigmoid(x) to sqrt(softplus(x)) This likely gives smoother positive routing scores with different gradient behavior. The paper does not deeply theorize this, but it is a meaningful router-stability design choice.   
+        </p>
+        <p>
+            They replace the dense FFN layers in the first few Transformer blocks with MoE layers that use Hash routing based on token ID. early layers often process lexical/token-level features. Hash routing can force stable early specialization without needing the learned router to make fragile decisions immediately.
+        </p>  
+        <h2 style="font-weight: normal;">
+            Training instability</h2>
+        <p>  
+         The paper says they encountered notable training instability in trillion-parameter MoE training. Simple rollback could temporarily recover, but did not prevent future spikes. They found spikes were tied to outliers in MoE layers, and routing seemed to amplify the problem and fix they did is(breaking the loop, and capping the numbers.): 
+        </p>
+        <p> 
+         1.Anticipatory Routing: Normally at step t, the model computes both features and routing using current parameters θ_t. DeepSeek decouples this where features use θ_t and routing indices use older θ_{t-Δt}. They only activate Anticipatory Routing when a spike is detected, then return to standard training. Active overhead is around 20%, but total overhead is small because it is not always on. 
+        </p> 
+        <p> 
+         2.SwiGLU clamping: They clamp the SwiGLU components, linear component: [-10, 10] gate component: upper capped at 10. This suppresses extreme activations in MoE experts. The authors explicitly say the theory is not fully understood.
+        </p>        
+        <p>  
+         small things: there is <a href="https://arxiv.org/pdf/2512.24880">MHC</a> residual connection used instead of standard residual and <a href="https://jeremybernste.in/writing/deriving-muon">Muon</a> as optimizer used with Adamw on some places.  The pretraining corpus is more than 32T tokens. V4-Flash is trained on 32T tokens; V4-Pro on 33T tokens.   
+        </p>
+        <h2 style="font-weight: normal;">
+            Infrastructure
+        </h2>
+        <h2 style="font-weight: normal;">Expert-parallel communication-computation overlap </h2>
+        <p> 
+         MoE can be acclerated with Expert parallelism(spreaded experts across gpu's). This means expensive all-to-all communication. for solution of this Deepseek fuses communication and computation into a pipelined kernel for communication-computation overlapping. 
+        </p>
+        <p> 
+         in naive solution Dispatch(all to all shuffle) happens where the entire system freezes to perform the All-to-All token shuffle. Compute: Once every single token is delivered, the network goes completely idle, and the GPUs finally start doing the math (Linear 1, Act, Linear 2). Combine: The GPUs freeze again to send the finished answers back to their original GPUs via another All-to-All shuffle. So observation they made is the total time it takes to communicate the data is actually less than the time it takes to compute the math.
+         if parallelism achieved between transferring data and computation then communication hides "underneath" the computation.
+        </p>
+        <p>
+          This fused kernel split experts into waves. While one wave is computing, another wave is dispatching, and another may be combining. The paper reports speedups of 1.50–1.73× for general inference workloads and up to 1.96× for latency-sensitive RL rollouts and agent serving.
+        </p>
+        <h2 style="font-weight: normal;">TileLang:</h2>
+        <p> 
+         DeepSeek uses TileLang(custom compiler/kernel infrastructure instead of PyTorch eager ops) to build fused kernels for their unusual architecture. That is needed Because CSA, HCA, mHC, FP4 paths, sparse attention, and custom projections would otherwise become hundreds of small PyTorch ops. That would kill performance due to launch overhead and memory movement. TileLang is essentially a compiler that translates high-level mathematical concepts into flawless, low-level GPU code almost instantly. 
+        </p>
+         <P>
+         TileLang gives advantage like 1. SMT-solver-assisted integer analysis for complex indexing means TileLang uses a mathematical proof engine (an SMT solver) to automatically guarantee the memory logic is perfect, 2. fast iteration on new attention variants, 3. numeric precision controls, 4.reproducibility, 5. host codegen to reduce Python invocation overhead(means logic in high-speed, low-level code (like C++ or specialized machine code) instead of Python). 
+        </p>
+        <h2 style="font-weight: normal;">
+          Batch-invariant and deterministic kernels  
+        </h2>
+        <p>
+         Computers represent decimal numbers (floating-point numbers) with a limited number of bits. Because of how these bits are rounded off at the absolute lowest decimal places, changing the order of composition changes the final bits of the answer. In kernels when this composition changes with threads the final mathematical output is non-deterministic; running the exact same data through the exact same code twice will produce two slightly different sets of numbers.
+        </p>
+        <p> 
+          So for making reproducibility concrete. DeepSeek wants kernels where a token's output is bitwise identical regardless of batch composition. They also want deterministic backward passes. Because at this scale, debugging without determinism is almost impossible. If a loss spike occurs, you need to reproduce it. If pretraining, post-training, and inference differ slightly, you may get silent behavior drift. Hence they implement deterministic attention backward, MoE backward, mHC matrix multiplication, and batch-invariant matrix multiplication.   
+        </p> 
+        <h2 style="font-weight: normal;">
+            FP4 quantization-aware training
+        </h2>
+        <p> 
+         They use FP4 quantization for MoE expert weight and CSA indexer qk path.  This reduces memory and speeds inference/rollout. During training, they simulate FP4 through FP4-to-FP8 dequantization, while keeping FP32 master weights. They also quantize index scores from FP32 to BF16 during QAT, reporting 2× top-k selector speedup while preserving 99.7% recall of KV entries. 
+        </p>
+
+        <h2 style="font-weight: normal;">Training framework</h2>
+        <p> 
+          1. Muon Sharding:  Muon requires whole matrices for update orthogonalization. Standard ZeRO sharding is not enough.
+           They use custom bucket assignment, padding, redundant computation across extra data-parallel groups when needed, and batched Newton-Schulz execution for same-shaped parameters.  
+        </p>
+        <p> 
+          ZeRO (Zero Redundancy Optimizer) not works for orthogonalization operation as entire matrices cant be treated as seprate blocks. Here Custom Bucket Assignment (The Knapsack Algorithm) being used, They use a "knapsack algorithm" to carefully drop whole matrices into different GPU "buckets". to do synchronization in parallelism DeepSeek adds "padding" (dummy zeros) to the smaller buckets so that every single GPU is processing the exact same amount of data down to the byte. 
+        </p> 
+        <p> 
+         2. mHC memory control: mHC increases activation memory because residual streams are expanded. They use fused kernels and selective recomputation to keep overhead manageable. The paper reports mHC wall-time overhead of only 6.7% of the overlapped 1F1B pipeline stage.   
+        </p>
+        <p> 
+         3. Contextual parallelism for compressed attention: Context parallelism splits the sequence across devices. But CSA/HCA compression needs consecutive token blocks. Compression blocks can cross rank boundaries. 
+        </p>
+
+        <h2 style="font-weight: normal;"> 
+            heterogeneous KV cache
+        </h2> 
+        <p> 
+        Normal PagedAttention assumes relatively uniform KV cache blocks. DeepSeek-V4 breaks that assumption as Sliding Window Attention (SWA) needs to constantly delete old tokens, Compressed Sparse Attention (CSA) shrinks 4 tokens into 1, Heavily Compressed Attention (HCA) shrinks 128 tokens into 1.
+        </p>
+        <p> 
+         1.The "State Cache" (The Short-Term Buffer): for sliding-window KV and uncompressed tail tokens not yet ready for compression.If the HCA layer compresses every 128 tokens, what happens when the model has only generated 50 tokens? It can't compress them yet. So, it stores these 50 "unready" tokens in the State Cache. They sit there in a waiting room until the 128th token arrives, at which point a compression calculation fires, squishes them into a single entry, and evicts them from the State Cache.   
+        </p>
+        <p> 
+         2. The "Classical KV Cache"(The Long-Term Archive): Once tokens are successfully squished, they are moved into the main Classical KV Cache. Because this cache only holds heavily compressed entries, it takes up a tiny fraction of the GPU memory.      
+        </p>
+          
+      
+        <p> 
+         I will publish another research blog on Post training + Rl of deepseeek-v4. 
+        </p>
+
+   
