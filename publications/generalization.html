@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generalization: The Inevitability of Deep Learning</title>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <!-- Math (KaTeX) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script>
+
+  <link rel="stylesheet" href="../css/article.css">
+</head>
+<body>
+  <nav class="nav-back">
+    <a href="../publications.html">blogs</a>
+  </nav>
+
+  <main class="page">
+    <article class="content">
+      <h1>Generalization: The Inevitability of Deep Learning</h1>
+
+      <p>
+        I remember that I had this question a year back: "What does it mean to understand things, and how is it different from memorization?" My rabbit hole with o3 led me to a clear explanation: "Understanding means deriving a short program that explains your data." Take this example, where we have some numbers: [0, 1, 1, 2, 3, 5, 8, 13...].
+      </p>
+
+      <p>
+        Memorization would be mugging up those numbers discretely. On the other hand, understanding would be like, "Oh, I know this is \(N = N_{t-1} + N_{t-2}\), which people call Fibonacci numbers." Here, you have derived a program that not only explains the data above but can universally produce those numbers. Think about the complexity it take to remember these numbers, which grows with \(O(N)\), versus finding a constant-size program, \(O(1)\), for generating them.
+      </p>
+
+      <p>
+        I asked this question as a product of another question: "Why can't computers understand things like we just did, by finding a short program from data?" I thought there would be a way where we could make computers derive a short program like this.
+      </p>
+
+      <p>
+        The thing is, the answer to that question is also answer of "why deep learning worked at all". I came across these talks by Ilya (<a href="https://www.youtube.com/watch?v=RvEwFvl-TrY">talk 1</a> and <a href="https://www.youtube.com/watch?v=AKMuA_TVz3A">talk 2</a>), where Ilya presented beautiful ideas about this foundational question with lucid answer it goes like: "Neural networks work because they are a practical way to search for short programs / small circuits that explain data," and "The shortest program that fits training data leads to the best possible generalization." A neural network is a circuit. It has layers, weights, activations, attention heads, and MLPs. Its architecture defines a space of possible computations. The weights choose one computation from that space.
+      </p>
+
+      <p>
+        It is like the best explanation is the shortest program that fits the data. First of all, we have data that gives us these kinds of short programs; otherwise, it would have no regularities to compress and would be pure noise. Above that, deep learning is working well because it is good at searching for this short program.
+      </p>
+
+      <p>
+        Well, it is a very simple and elegant idea in theory, but we know it is computationally intractable because the space of such short programs is enormous, and you basically cannot look through each one for an optimal fit to the data. With this, Ilya again made a very good point: what about small circuits? Instead of searching over all programs, you search over small circuits. A neural network is a kind of differentiable circuit. So instead of searching over arbitrary programs, neural nets search over a structured, continuous space of circuits.
+      </p>
+
+      <p>
+        This means neural network training = searching for a small, useful program inside a differentiable circuit family. This is why neural networks generalize. They are not just memorizing data. At their best, they discover reusable, compact computations. Foundationally, it is this: "Reality has regularities. Regularities are compressible. Neural networks trained by backprop can discover compact circuits that express those regularities." Differentiability is one of the biggest paradigms in learning, where classical computing is mostly about "write the program by hand," while differentiable computation is "define a space of possible programs, then let optimization search inside it."
+      </p>
+
+      <pre><code class="language-txt">architecture = restricted program space
+parameters = coordinates inside that space
+loss = what counts as a good program
+backprop = search procedure
+training data = constraints on the program
+generalization = discovered compressed rule</code></pre>
+
+      <p>
+        That tells lot about architectures. CNNs restricted the search toward local visual structure. Transformers restricted the search toward relational memory/retrieval structure. The idea is simple: choose a scalable, differentiable search space whose structure matches the hidden structure of the problem.
+      </p>
+
+      <pre><code class="language-txt">For vision:
+  hidden structure = local spatial patterns
+  differentiable search space = CNNs
+
+For language:
+  hidden structure = nonlocal relational dependencies
+  differentiable search space = transformers/attention</code></pre>
+
+      <p>
+        One subtle thing is that backprop does not guarantee the shortest true program. It does not solve Solomonoff induction. It gives a practical approximation. So it is not guaranteed to find the shortest explanation, but it is often compressed enough to generalize. Scale matters because it gives the circuit enough capacity, data gives enough constraints, architecture gives the right bias, and backprop searches.
+      </p>
+
+      <p>
+        This tells us "why deep learning works."
+      </p>
+
+      <p>
+        Thanks to Ilya!
+      </p>
+    </article>
+  </main>
+</body>
+</html>
