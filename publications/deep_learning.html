@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="../images/self.png" type="image/png">
+  <title>Byte Movement per Unit Learning</title>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <!-- Math (KaTeX) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body);"></script>
+
+  <link rel="stylesheet" href="../css/article.css">
+</head>
+<body>
+  <nav class="nav-back">
+    <a href="../publications.html">blogs</a>
+  </nav>
+
+  <main class="page">
+    <article class="content">
+      <h1>Byte movement per unit learning</h1>
+
+      <p>
+        After writing kernels and building an understanding of the infrastructure behind scaling distributed model training, one realization became clear to me: at the level of first principles, scaling deep learning is the problem of maximizing useful learning per unit of information movement. The core question is: how little information can you move, how rarely can you synchronize it, and still make the model learn as if everything were globally connected?
+      </p>
+
+      <p>
+        At small scale, model training feels like mathematical computation. When we scale it to a data center, it starts to feel more like physics, where compute locality, bandwidth, latency, topology, synchronization, memory hierarchy, fault tolerance, and energy all matter.
+      </p>
+
+      <p>
+        Distributed training is where information flows across GPU memory, GPU interconnects, nodes, racks, data-center fabric, and storage. The bottleneck changes depending on scale. Sometimes compute is the bottleneck. Sometimes it is memory bandwidth, topology-aware algorithms, pipeline bubbles, stragglers, or checkpointing. The more global dependencies you have, the more cost you pay for information movement.
+      </p>
+
+      <p>
+        From this, we can see that useful scaling means high useful compute and low communication. A good architecture lets devices do a lot of local computation before requiring global communication. Every kind of parallelism, including data, pipeline, tensor, expert, and context parallelism, follows the same invariant: where should information live, when should it move, and how much must move?
+      </p>
+
+      <p>
+        We can see this below. Dense attention moves token-token interactions and faces a bottleneck from quadratic sequence communication, while linear attention and MLA use recurrent state summaries or compressed KV latents. This gives them higher local compute and less reliance on global communication. while dense attention gives more expressivity communication remains important conversely in linear attention and DeepSeek MLA attention has more local computation without much of communication.
+      </p>
+
+      <pre class="info-map">                    Info moved                  Compute   Communication        Bottleneck
+-----------------------------------------------------------------------------------------------
+Dense attention               token-token interactions    medium    high                 context communication
+Linear attention              recurrent state summary     high      lower                state compression
+MLA                           compressed KV latent        high      lower                latent quality
+MoE                           expert routing              high      sparse, irregular    load balance
+Tensor parallel MLP/attention partial matmul outputs      high      frequent             all-reduce / all-gather
+Data parallel                 gradients                   high      periodic             gradient sync
+</pre>
+
+      <p>
+        The main design principle is to shape the computation so less information needs to move in the first place. On one GPU, computation is what matters most, and communication is mostly internal memory movement. At scale, communication becomes an important part of the algorithm itself.
+      </p>
+    </article>
+  </main>
+</body>
+</html>
