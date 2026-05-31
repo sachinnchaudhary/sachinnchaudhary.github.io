@@ -158,7 +158,7 @@ li:last-child {
 }
 
 .yantra-svg {
-  width: min(420px, 100vw); /* bigger, since it’s flatter now */
+  width: min(420px, 30vw); /* bigger, since it’s flatter now */
   height: auto;
   display: block;
 }
