@@ -47,7 +47,8 @@
         We can see this below. Dense attention moves token-token interactions and faces a bottleneck from quadratic sequence communication, while linear attention and MLA use recurrent state summaries or compressed KV latents. This gives them higher local compute and less reliance on global communication. while dense attention gives more expressivity communication remains important conversely in linear attention and DeepSeek MLA attention has more local computation without much of communication.
       </p>
 
-      <pre class="info-map">                    Info moved                  Compute   Communication        Bottleneck
+      <pre class="info-map">             
+computational circuit         Info moved                  Compute   Communication        Bottleneck
 -----------------------------------------------------------------------------------------------
 Dense attention               token-token interactions    medium    high                 context communication
 Linear attention              recurrent state summary     high      lower                state compression
