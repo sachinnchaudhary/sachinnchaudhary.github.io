@@ -6,6 +6,7 @@
 html, body {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 /* ---------- Background ---------- */
@@ -72,12 +73,33 @@ pre {
   overflow-x: auto;
   border-radius: 6px;
   margin: 2rem 0;
+  scrollbar-color: #4b5058 #14161a;
+  scrollbar-width: thin;
+}
+
+pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: #14161a;
+  border-radius: 999px;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #4b5058;
+  border-radius: 999px;
+  border: 1px solid #14161a;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #6a707a;
 }
 
 pre code {
   background: none;
   padding: 0;
-  font-size: 0.95rem;
+  font-size: 0.78rem;
   line-height: 1.6;
   font-family: monospace;
 }
@@ -121,6 +143,66 @@ pre code {
   transform: translateX(2px);
 }
 
+.distributive-training-page .article-toc {
+  position: fixed;
+  top: 6.6rem;
+  left: 3.7rem;
+  width: 170px;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #343942 transparent;
+}
+
+.distributive-training-page .article-toc-title {
+  margin-bottom: 0.7rem;
+  color: #7f8792;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.distributive-training-page .article-toc a {
+  display: block;
+  margin: 0.42rem 0;
+  color: #8f949b;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.distributive-training-page .article-toc a:hover {
+  color: #d8d8d8;
+  transform: translateX(2px);
+}
+
+.distributive-training-page .article-toc .article-toc-sub {
+  margin-left: 0.85rem;
+  color: #6f757e;
+  font-size: 0.86rem;
+}
+
+.distributive-training-page .article-toc::-webkit-scrollbar {
+  width: 5px;
+}
+
+.distributive-training-page .article-toc::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.distributive-training-page .article-toc::-webkit-scrollbar-thumb {
+  background: #343942;
+  border-radius: 999px;
+}
+
+@media (max-width: 1080px) {
+  .distributive-training-page .article-toc {
+    display: none;
+  }
+}
+
 .content a {
   color: inherit;
   text-decoration: underline;  
@@ -141,10 +223,51 @@ pre code {
   text-align: center;
 }
 
+.figure-wide {
+  width: min(calc(100vw - 2rem), 1560px);
+  margin-left: 50%;
+  transform: translateX(-50%);
+  overflow-x: auto;
+  scrollbar-color: #4b5058 transparent;
+  scrollbar-width: thin;
+}
+
+.figure-wide::-webkit-scrollbar {
+  height: 6px;
+}
+
+.figure-wide::-webkit-scrollbar-track {
+  background: #0b0d10;
+  border-radius: 999px;
+}
+
+.figure-wide::-webkit-scrollbar-thumb {
+  background: #4b5058;
+  border-radius: 999px;
+  border: 1px solid #0b0d10;
+}
+
+.figure-wide::-webkit-scrollbar-thumb:hover {
+  background: #6a707a;
+}
+
 .figure img {
   max-width: 100%;
   height: auto;
   border-radius: 6px;          /* subtle, optional */
+}
+
+.figure-wide img {
+  max-width: none;
+  width: var(--figure-width, 1560px);
+}
+
+.figure img.diagram {
+  width: min(100%, 300px);
+}
+
+.figure img.diagram-sm {
+  width: min(100%, 500px);
 }
 
 .figure figcaption {
@@ -176,3 +299,4 @@ pre code {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
