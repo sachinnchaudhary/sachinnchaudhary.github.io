@@ -20,8 +20,24 @@ body {
   color: #d6d6d6;
   font-family: "EB Garamond", serif;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2.2rem;
+  padding: 2rem;
+}
+
+/* ---------- Homepage Intro ---------- */
+.home-intro {
+  max-width: 36rem;
+  text-align: center;
+}
+
+.home-intro p {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.6;
+  color: #d9d9d9;
 }
 
 /* ---------- Center Menu ---------- */
