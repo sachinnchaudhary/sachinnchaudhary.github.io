@@ -109,6 +109,20 @@ pre code {
   margin: 2rem 0;
 }
 
+.katex {
+  font-size: 1em;
+}
+
+.katex-display {
+  margin: 1.4rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex-display > .katex {
+  font-size: 1.05em;
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
   p,
@@ -298,5 +312,46 @@ pre code {
 .reading-list a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.article-list {
+  margin: 0 0 1.6rem;
+  padding-left: 1.4rem;
+}
+
+.article-list li {
+  font-size: 1.2rem;
+  line-height: 1.7;
+  margin-bottom: 0.8rem;
+}
+
+.footnote-ref {
+  margin-left: 0.1rem;
+  text-decoration: none;
+}
+
+.footnote-ref sup {
+  font-size: 0.72em;
+  color: #b8bec7;
+}
+
+.footnote {
+  margin-top: 3.5rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid #2a2f36;
+}
+
+.footnote-label {
+  margin-bottom: 1rem;
+  color: #9a9a9a;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.footnote-back {
+  margin-left: 0.4rem;
+  color: #b8bec7;
+  font-size: 1rem;
 }
 
