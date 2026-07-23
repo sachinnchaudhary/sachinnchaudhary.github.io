@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../images/self.png" type="image/png" />
+    <title>Deriving Muon</title>
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Math (KaTeX) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '\\(', right: '\\)', display: false }] });"
+    ></script>
+
+    <link rel="stylesheet" href="../css/article.css" />
+  </head>
+  <body>
+    <nav class="nav-back" aria-label="Back to blogs">
+      <a href="../publications.html">Blogs</a>
+    </nav>
+
+    <main class="page">
+      <article class="content">
+        <h1>just Rotate!</h1>
+        <p> 
+         at each step, gradient has direction and magnitude. turns out direction is important and maximal use of direction gaves you sample efficiency. this is what muon and shampoo did. <i>you must do rotation!</i> 
+         think about this, We move in parameter space but information comes from loss space. gradient is "where to move for fastest descend in loss space" but does this translates well to "most meaningful change in what the network does."
+          translating from loss space to parameter space is get distorted and muon gets that back with orthogonalization. at each step What varies is how much functional change you get per computation. 
+        </p> 
+       <p>
+       It basically constraining spectral norm of 1 \(\lVert \Delta W \rVert_{\mathrm{op}} \le 1\) makes inevitable why Muon keeps rotational matrices \(UV^T\)(making \(\Sigma\) = 1) and achieve Maximum information density per step. In muon, all directions updated equally per step(or more independent directions simultaneously per step).  
+       </p>
+       <p> 
+        this actually helps muon to scale well in larger and larger models. As a weight matrix gets wider, the number of independent singular directions grows with \(\min(m, n)\). The skew problem (few directions dominate) become worse. As muon keeps all singular values as 1 smoothly vanishes with width. 
+       </p>
+       <p> 
+        flattening this singular values gives another benefits such as total "stretch" of the space is fixed, the total mathematical energy of the matrix is locked strictly to its rank (its width/height). This resonates with \(\mu\mathrm{P}\) hyperparameters transfer. If you double the width of the matrix (\(UV^T\), the average squared value of a single cell is exactly \(1 / \text{width}\)), the magnitude of every individual number inside the Muon update automatically and perfectly halves itself to compensate. The matrix self-regulates.
+       </p>
+
+
+        <aside class="footnote" id="expectation-footnote">
+        <h2>Derivation of muon</h2>
+          <p>
+          We will derive Muon while gaining an intuitive understanding. We saw
+          how Muon is more sample-efficient and even
+          <a href="https://arxiv.org/pdf/2502.16982">scalable</a> in
+          trillion-parameter models.
+        </p>
+
+        <p>Look at this problem.</p>
+
+        <p>
+          We know how linear transformations in neural networks happen with
+          input \(X\) and weight \(W\).
+        </p>
+
+        $$Y = WX$$
+
+        <p>
+          Now, computing the derivative with respect to the output through the
+          loss gives us \(G\):
+        </p>
+
+        $$G = \frac{\partial L}{\partial Y} X^T$$
+
+        <p>Let's take this example, where our gradient matrix \(G\) is:</p>
+
+        $$G = \begin{bmatrix} 7.0 & -4.0 \\ -0.07 & 0.0 \end{bmatrix}$$
+
+        <p>
+          Now, let's say we are updating weights with a learning rate of
+          \(0.1\), given the weight matrix \(W\) and gradient matrix \(G\).
+        </p>
+
+        $$W = \begin{bmatrix} 1.0 & 2.0 \\ -1.0 & 0.5 \end{bmatrix}, \quad G = \begin{bmatrix} 7.0 & -4.0 \\ -0.07 & 0.0 \end{bmatrix}$$
+
+        <p>If we compute the operation, we get:</p>
+
+        $$\begin{bmatrix} W_{11}^{\text{new}} & W_{12}^{\text{new}} \\ W_{21}^{\text{new}} & W_{22}^{\text{new}} \end{bmatrix} = \begin{bmatrix} 1.0 - 0.1(7.0) & 2.0 - 0.1(-4.0) \\ -1.0 - 0.1(-0.07) & 0.5 - 0.1(0.0) \end{bmatrix}$$
+
+        $$\begin{bmatrix} W_{11}^{\text{new}} & W_{12}^{\text{new}} \\ W_{21}^{\text{new}} & W_{22}^{\text{new}} \end{bmatrix} = \begin{bmatrix} 0.3 & 2.4 \\ -0.993 & 0.5 \end{bmatrix}$$
+
+        <p>
+          Now look at the values. The \(W_{11}\) value moved from \(1.0\) to
+          \(0.3\) with a huge jump, trusting this information. Similarly,
+          \(-1.0\) moved to \(-0.993\) a microscopic crawl of \(0.007\). Almost
+          no learning freezes it. This is the problem: if you increase the
+          learning rate to make sure that the frozen value learns, the other
+          large value will overshoot and divergence will occur. If you keep the
+          learning rate small, learning will be too slow!
+        </p>
+
+        <p>
+          In gradient descent, \(G\) represents the local slope, telling us how
+          sensitive the loss function is to a change in a specific weight at
+          this exact micro-coordinate. Considering the slope as the distance to
+          the minimum and then taking steep steps or crawling based on its value
+          is somewhat misleading in compositional neural network functions.
+        </p>
+
+        <p id="gradient">
+          A high gradient value means the loss is sensitive at that coordinate.
+          Any change will bring a large difference in the output \(Y\). Taking
+          proportional steps based on that gradient causes training to diverge;
+          hence, we need a small step for high values. Conversely, a low gradient
+          value means insensitivity at that coordinate: the loss will not react
+          as strongly. This low sensitivity requires large steps. This is an
+          inverse relationship.
+        </p>
+
+        <p>
+          This is why we don't want magnitude. We want the direction which side
+          we should move toward, but magnitude is not useful in learning(and when we're training large models).
+        </p>
+
+        <p>
+          Adam solves this exact problem. It first solves the problem of using a
+          fixed learning rate for all gradients by removing magnitude from the
+          gradients.
+        </p>
+
+        <p>
+          How does it solve this? Simple: the gradient gets divided by the square
+          root of its square:
+        </p>
+
+        $$\frac{7}{\sqrt{7^2}} = 1$$
+
+        $$\frac{-0.07}{\sqrt{(-0.07)^2}} = -1$$
+
+        <p>
+          This basically removes the magnitude of the gradient. But wait if the
+          gradient told us to move \(7\) and we erase this learning by destroying
+          that information, what happens? This is the question I had. We already
+          <a href="#gradient">discussed</a> that there is an inverse relationship:
+          a high gradient needs small steps and vice versa where direction matters over magnitude.
+        </p>
+
+        <p>Look at the new weights we computed after normalization.</p>
+
+        $$W_{\text{new}} = \begin{bmatrix} 0.9 & 2.1 \\ -0.9 & 0.5 \end{bmatrix}$$
+
+        <p>Compare them with the unnormalized matrix:</p>
+
+        $$\begin{bmatrix} W_{11}^{\text{new}} & W_{12}^{\text{new}} \\ W_{21}^{\text{new}} & W_{22}^{\text{new}} \end{bmatrix} = \begin{bmatrix} 0.3 & 2.4 \\ -0.993 & 0.5 \end{bmatrix}$$
+
+        <p>The updates of the normalized matrix are now smooth.</p>
+
+        <p>
+          If Adam works well, then why Muon? We saw that Adam takes each element
+          and normalizes it before updating the entire matrix. Adam not treats a
+          weight matrix as a unified geometric transformation, but as single
+          scalar numbers. In a linear transformation, weights are structurally
+          dependent on each other. Adam destroys the covariance (the mathematical
+          relationship) between the dimensions by modifying the elements
+          independently. Training over thousands of steps can degenerate the
+          internal vector space of weight matrices.
+        </p>
+
+        <p>
+          Well, we derived “why Muon”, so how does it maintain this
+          coordinate space of matrices?
+        </p>
+
+        <p>
+          Muon basically normalizes entire matrices instead of normalizing
+          scalars. That's it.
+        </p>
+
+        <p>Adam performs scalar normalization with:</p>
+
+        $$\hat{x} = \frac{x}{\sqrt{x^2}}$$
+
+        <p>Muon performs matrix normalization with:</p>
+
+        $$\hat{G} = G (G^T G)^{-1/2}$$
+
+        <p>
+          Muon's intuition is: “When you divide a matrix by its own matrix
+          magnitude, \(G (G^T G)^{-1/2}\), the mathematical result is an
+          orthogonal matrix.” An interesting property of orthogonal matrices is
+          that all their singular values are exactly \(1\). Adam makes every
+          element \(1\); here, every singular value of the matrix is \(1\).
+          Updating the matrix with \(\hat{G}\), which is perfectly orthogonal,
+          acts as a pure rotation in high-dimensional space. It does not stretch,
+          scale, or collapse the vector space; it only rotates it.
+        </p>
+
+        <p>
+          Let's derive why \(\hat{G} = G (G^T G)^{-1/2}\) is inevitable through
+          singular value decomposition. Every matrix \(G\) can be decomposed into
+          three parts:
+          
+        </p>
+         
+        $$G = U \Sigma V^T$$
+
+        <p>(You can check this <a href="../sidequests/math_proof/svd.html">mathematical proof</a>.)</p>
+
+        <p>
+          Here, \(V\) and \(U\) are rotational matrices, and \(\Sigma\) contains
+          the singular values that stretch and squish matrices. We need to
+          mathematically delete \(\Sigma\) and keep \(UV^T\). This is why
+          \(\hat{G} = G (G^T G)^{-1/2}\) is inevitable.
+        </p>
+
+        <p>We need to calculate \(G^T G\) (the squared magnitude):</p>
+
+        $$G^T G = (V \Sigma U^T) (U \Sigma V^T)$$
+
+        <p>
+          \(U^T U\) cancels out to the identity matrix \(I\) (as it is
+          orthogonal).
+        </p>
+
+        $$G^T G = V \Sigma^2 V^T$$
+
+        <p>
+          But to remove sigma, we made it \(\Sigma^2\), so we neutralize it by
+          taking the square root, \(1/2\), and then the inverse,
+          \(\Sigma^{-1}\), as:
+        </p>
+
+        $$\Sigma \Sigma^{-1} = I$$
+
+        <p>Applying \((G^T G)^{-1/2}\) gives us:</p>
+
+        $$(G^T G)^{-1/2} = V \Sigma^{-1} V^T$$
+
+        <p>Now, multiplying it by the original \(G\) gives:</p>
+
+        $$G (G^T G)^{-1/2} = (U \Sigma V^T) (V \Sigma^{-1} V^T)$$
+
+        <p>Here, \(V^T V\) cancels out to \(I\).</p>
+
+        $$= U \Sigma \Sigma^{-1} V^T$$
+
+        <p>Again, \(\Sigma \Sigma^{-1}\) cancels out to \(I\).</p>
+
+        $$= U V^T$$
+
+        <p>
+          We just mathematically isolated and deleted the magnitude matrix
+          \(\Sigma\), leaving only \(UV^T\) called Orthogonal Polar Factor.
+        </p>
+
+        <h2>Muon computationally at scale</h2>
+
+        <p>
+          Coming to the code, we know it's hard for computers to compute complex
+          functions. Computing \((G^T G)^{-1/2}\) is expensive (\(O(n^3)\)).
+          That's why we use a polynomial approximation(like taylor series) to compute
+          this. That is the reason we use Newton-Schulz, which approximates these
+          orthogonal matrices using only matrix multiplication(GPUs go brrrr!) 
+          instead of fully computing the SVD.
+        </p>
+
+        <p>This is the code for Newton-Schulz:</p>
+
+        <pre><code>
+X = X / (X.norm(dim=(-2, -1), keepdim=True) + 1e-7)
+# Perform the NS iterations
+for _ in range(steps):
+    A = X @ X.mT
+    B = b * A + c * A @ A  # Quintic computation strategy.
+    X = a * X + B @ X
+
+if G.size(-2) > G.size(-1):
+    X = X.mT
+
+return X
+</code></pre>
+
+        <p>
+          This is the derivation of the mathematical proof of this
+          <a href="../sidequests/math_proof/newton_schulz.html">Newton-Schulz operation</a>.
+        </p>
+      </aside> 
+      </article>
+    </main>
+  </body>
+</html>

@@ -46,6 +46,24 @@ p {
   line-height: 1.75;
   margin-bottom: 1.6rem;
 }
+/* ---------- Centered quote / tweet ---------- */
+.tweet-quote {
+  width: min(calc(100% - 2rem), 580px);
+  margin: 2.6rem auto;
+  padding: 0.1rem 0 0.1rem 1.4rem;
+  border-left: 3px solid #7f927b;
+  color: #d8d8d8;
+}
+
+.tweet-quote p {
+  margin: 0 0 1.25rem;
+  font-size: 1.12rem;
+  line-height: 1.65;
+}
+
+.tweet-quote p:last-child {
+  margin-bottom: 0;
+}
 
 /* ---------- Headings ---------- */
 h2 {
@@ -97,11 +115,13 @@ pre::-webkit-scrollbar-thumb:hover {
 }
 
 pre code {
+  display: block;
   background: none;
   padding: 0;
   font-size: 0.78rem;
   line-height: 1.6;
   font-family: monospace;
+  position: static;
 }
 
 /* ---------- Math ---------- */
@@ -125,6 +145,14 @@ pre code {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
+  .content {
+    padding-top: 4.5rem;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+
   p,
   li {
     font-size: 1.3rem;
@@ -132,17 +160,11 @@ pre code {
   }
 }
 
-@media (max-width: 600px) {
-  h1 {
-    font-size: 1.7rem;
-  }
-}
-
 /* ---------- Back / Home Navigation ---------- */
 .nav-back {
   position: absolute;
   top: 1.8rem;
-  left: 4.5rem;
+  left: clamp(1.5rem, 4vw, 4.5rem);
 }
 
 .nav-back a {

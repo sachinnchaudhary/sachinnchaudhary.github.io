@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../images/self.png" type="image/png" />
+    <title>Bias vs. Variance in RL</title>
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Math (KaTeX) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body);"
+    ></script>
+
+    <link rel="stylesheet" href="../css/article.css" />
+  </head>
+  <body>
+    <nav class="nav-back">
+      <a href="../publications.html">blogs</a>
+    </nav>
+
+    <main class="page">
+      <article class="content">
+        <h1>Bias vs. Variance in RL</h1>
+
+        <p>
+          It's been a while since I posted this
+          <a href="https://x.com/chsacy/status/2071175942324851100?s=20">tweet</a>.
+          It's about how, as RL progressed, it relied more on
+          <a href="https://x.com/MillionInt/status/2057098142273904835?s=20">variance instead of bias</a>.
+          I call this idea
+          <i>&ldquo;it's better to have no beliefs than wrong beliefs.&rdquo;</i>
+        </p>
+
+        <blockquote class="tweet-quote">
+          <p>Bias vs. Variance in RL:</p>
+
+          <p>
+            As we're training models with longer and longer-horizon trajectories,
+            a value function or similar bias mechanism seems inevitable.
+            Historically, as RL progressed, it added more variance and paid for
+            that with more compute.
+          </p>
+
+          <p>
+            Dynamic programming &rarr; model-based &rarr; value-based &rarr;
+            policy gradient &rarr; PPO &rarr; GRPO.
+          </p>
+
+          <p>
+            Even GRPO removed the learned value function, replacing it by
+            computing the advantage purely from the group mean. It has more
+            variance than PPO but one fewer learned component making assumptions
+            about value structure. In a language-modeling setting, we saw that
+            compute is growing so quickly that it is actually cheap to sample
+            many responses per prompt compared with learning a value function.
+          </p>
+
+          <p>
+            The historical winner has been the high-variance, low-bias side
+            because of the available scale of compute.
+          </p>
+
+          <p>
+            A high-variance method works when you can learn the signal by paying
+            for lots of compute at scale. When the signal itself is too rare to
+            observe even at scale, you need bias to guide the search toward the
+            signal in the first place.
+          </p>
+
+          <p>
+            In a long-horizon setting where the signal is sparse, even with
+            enormous compute, we cannot learn it. Variance cannot be averaged out
+            by compute alone. We need some form of inductive bias to obtain a
+            signal for the gradient.
+          </p>
+
+          <p>
+            Methods that add just enough bias to find the signal and let variance
+            average out at scale are what I find optimal.
+          </p>
+        </blockquote>
+
+        <p>
+          High-bias methods make strong assumptions to reduce noise. They're
+          efficient when those assumptions hold; in that case, you need less data
+          to get a stable signal. But if the assumptions are wrong, incomplete,
+          or do not hold at scale, then the ceiling is the assumption itself.
+        </p>
+
+        <p>
+          High-variance methods make weaker assumptions. They're noisy and need
+          more data, but they are not constrained by wrong beliefs about the
+          world. Scale gives them more samples, which averages out the variance.
+          The ceiling is just compute and data.
+        </p>
+
+        <p>
+          When compute was scarce, bias was acceptable. You could not afford to
+          average out variance anyway, so you let the assumptions do the work.
+          When compute became abundant, the assumptions became the bottleneck.
+          High-variance methods suddenly got a chance to prove themselves.
+        </p>
+
+        <p>
+          The idea that the <i>ceiling is just compute and data</i> is becoming
+          cheaper to fulfill with on-policy algorithms. We know that compute has
+          scaled over the years, beating even Moore's law, which means that doing
+          more rollouts is becoming possible and actually works. This is why we
+          can afford to remove bias. One example is GRPO, which removes the
+          learned value function entirely.
+        </p>
+
+        <p>
+          Variance is a statistical problem. More data solves it, and the solution
+          scales with compute. Bias is a structural problem. Wrong assumptions
+          are instantiated in the method, and data cannot fix them:
+          &ldquo;you just get a more precise answer to the wrong question.&rdquo;
+        </p>
+
+        <p>
+          However, there is one small caveat: high-variance methods win when the
+          signal exists and is observable at the scale you can afford. When the
+          signal itself is too rare to observe even at scale, you need bias to
+          guide the search toward the signal in the first place. But it needs to
+          be the right kind of inductive bias: one that guides the search toward
+          the signal so that variance can later average out at scale.
+        </p>
+
+        <p>
+          The idea is
+          <i>&ldquo;scale is a solution that doesn't require being right about
+          anything. Bias requires being right.&rdquo;</i>
+          When we design an architecture, we are betting that a structure exists
+          in the problem. If it does, then we have compressed the search space,
+          and we need less data. If it does not, we have built a wall. This
+          resonates with
+          <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">The Bitter Lesson</a>
+          by Sutton et al.
+        </p>
+
+        <h2>Why don't high-bias, off-policy methods scale well?</h2>
+
+        <p>
+          I learned about this research,
+          <a href="https://seohong.me/blog/q-learning-is-not-yet-scalable/">Q-learning Is Not Yet Scalable</a>
+          (thanks to <a href="https://x.com/Clashluke">Lucas!</a>), and my rabbit
+          hole started again because it empirically supports the insights shared
+          in the tweet above.
+        </p>
+
+        <p>
+          This research essentially explains why off-policy methods have not
+          scaled as well as on-policy methods.
+        </p>
+
+        <p>Excerpt from Seohong Park's research post:</p>
+
+        <blockquote
+          class="tweet-quote"
+          id="q-learning-problem-quote"
+          cite="https://seohong.me/blog/q-learning-is-not-yet-scalable/"
+        >
+          <p><strong>What's the problem?</strong></p>
+
+          <p>
+            Then, what fundamentally makes Q-learning not readily scalable to
+            complex, long-horizon problems, unlike other objectives? Here is my
+            answer:
+          </p>
+
+          $$
+          \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}}
+          \left[
+            \left(
+              Q_\theta(s,a) -
+              \underbrace{
+                \left(r + \gamma \max_{a'} Q_{\bar{\theta}}(s',a')\right)
+              }_{\text{Biased }\left(\text{i.e., } \neq Q^*(s,a)\right)}
+            \right)^2
+          \right]
+          $$
+
+          <p>
+            Q-learning struggles to scale because the <strong>prediction targets
+            are biased, and these biases accumulate over the horizon.</strong>
+            The presence of <strong>bias accumulation</strong> is a fundamental
+            limitation that is <em>unique</em> to Q-learning (TD learning). For
+            example, there are no biases in prediction targets in other scalable
+            objectives (e.g., next-token prediction, denoising diffusion,
+            contrastive learning, etc.) or at least these biases do not accumulate
+            over the horizon (e.g., BYOL, DINO, etc.).
+          </p>
+        </blockquote>
+
+        <p>
+          This points to the same problem we've been considering: Q-learning
+          struggles to scale because its prediction targets are biased, and
+          these biases accumulate over the horizon. This accumulation is a
+          fundamental limitation unique to Q-learning (TD learning).
+        </p>
+
+        <p>
+          This happens in Q-learning because &ldquo;we're using a guess to
+          improve a guess&rdquo;:
+        </p>
+
+        <div class="math">
+          $$
+          Q_{\text{target}} =
+          r + \gamma \max_{a'} Q_{\bar{\theta}}(s', a')
+          $$
+        </div>
+
+        <p>
+          The target itself uses \(Q_{\bar{\theta}}\) to approximate
+          Q-function. It was itself built from another approximate Q-function,
+          which was built from another. This is the bias that compounds rather
+          than smoothing out.
+        </p>
+
+        <p>
+          With longer and longer horizons, the biases in bootstrapped targets
+          become difficult to <i>mitigate</i> with more data and a larger model.
+          In the research, they prepared a set of tasks that require complex
+          policy learning. The thing is, none of the standard, widely used
+          offline RL algorithms were able to solve all of these tasks, even with
+          1B-sized datasets, which are 1,000 times larger than typical datasets
+          used in offline RL. More importantly, their performance often
+          plateaued far below optimal performance.
+        </p>
+
+        <p>
+          We know that GAE smooths out this bias with more data, but why does it
+          compound here? The target in supervised learning comes from outside
+          the model, while Q-learning's target contains its own Q-function. This
+          propagates errors to subsequent steps instead of averaging them out.
+          Supervised learning carries ground truth that is independent of the
+          model's prediction. In Q-learning, the &ldquo;ground truth&rdquo; used
+          for training at each step is contaminated by the current prediction
+          because we are using a guess to improve a guess. Therefore, more data
+          means more contaminated training signal, not more correction.
+        </p>
+      </article>
+    </main>
+  </body>
+</html>
