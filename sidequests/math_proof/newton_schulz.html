@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../images/self.png" type="image/png" />
+    <title>Newton-Schulz</title>
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Math (KaTeX) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '\\(', right: '\\)', display: false }] });"
+    ></script>
+
+    <link rel="stylesheet" href="../../css/article.css" />
+  </head>
+  <body>
+    <nav class="nav-back" aria-label="Back to math notebook">
+      <a href="../math.html">Math notebook</a>
+    </nav>
+
+    <main class="page">
+      <article class="content">
+        <h1>Newton-Schulz</h1>
+        <p> 
+
+       $$
+\begin{aligned}
+x &= U\Sigma V^T \\[6pt]
+
+A &= xx^T
+   = U\Sigma V^T V\Sigma U^T \\[6pt]
+
+A &= U\Sigma^2U^T \\[6pt]
+
+A\times A
+  &= U\Sigma^2U^T\cdot U\Sigma^2U^T \\[6pt]
+
+A\times A
+  &= U\Sigma^4U^T \\[6pt]
+
+B &= b\cdot A+c\cdot[A\times A] \\[6pt]
+
+B &= b\cdot U\Sigma^2U^T+c\cdot U\Sigma^4U^T \\[6pt]
+
+  &= bU\Sigma^2+c\cdot\Sigma^4U^T \\[6pt]
+
+  &\quad U\cdot b\cdot\Sigma^2+c\cdot\Sigma^4U^T \\[6pt]
+
+\Rightarrow\quad
+B &= U[b\Sigma^2+c\cdot\Sigma^4]U^T \\[6pt]
+
+B\times x
+  &= U[b\cdot\Sigma^2+c\cdot\Sigma^4]
+     \underbrace{U^T\times U}_{I}
+     \Sigma V^T \\[6pt]
+
+B\cdot x
+  &= U[b\cdot\Sigma^3+c\cdot\Sigma^5]V^T \\[6pt]
+
+x_{\mathrm{new}}
+  &= a\cdot x+B\cdot x \\[6pt]
+
+  &= a\cdot U\Sigma V^T
+     +U\cdot[b\cdot\Sigma^3+c\cdot\Sigma^5]V^T \\[6pt]
+
+  &= Ua\Sigma V^T
+     +U[b\cdot\Sigma^3+c\cdot\Sigma^5]V^T \\[6pt]
+
+x_{\mathrm{new}}
+  &= U[a\Sigma+b\cdot\Sigma^3+c\cdot\Sigma^5]V^T
+\end{aligned}
+$$
+</p>
+<br>
+<p> 
+<a href="/publications/muon.html">back to Deriving Muon blog.</a> 
+</p>
+
+      </article>
+    </main>
+  </body>
+</html>
+
+
+
